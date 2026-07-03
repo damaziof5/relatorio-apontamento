@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Relatório de Controle de Apontamento — Resumo Geral</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Arial,sans-serif;font-size:12px;color:#1a1a1a;background:#f4f4f4;padding:16px}
+  /* HEADER */
+  .header{background:#003366;color:#fff;padding:14px 20px;border-radius:6px 6px 0 0;display:flex;align-items:center;justify-content:space-between}
+  .header-left{display:flex;flex-direction:column;gap:3px}
+  .header-logo{font-size:18px;font-weight:700;letter-spacing:1px}
+  .header-sub{font-size:10px;color:#b0c4de;letter-spacing:.5px}
+  .header-right{text-align:right;font-size:10px;color:#b0c4de;line-height:1.6}
+  .doc-info{background:#002244;color:#b0c4de;padding:8px 20px;font-size:10px;display:flex;gap:32px;border-bottom:2px solid #f5a623}
+  /* CARDS KPI */
+  .kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:14px 0}
+  .kpi{background:#fff;border:1px solid #ddd;border-radius:4px;padding:12px 14px;border-left:4px solid #003366}
+  .kpi-label{font-size:10px;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+  .kpi-value{font-size:22px;font-weight:700;color:#003366}
+  .kpi-sub{font-size:10px;color:#888;margin-top:2px}
+  /* SECTIONS */
+  .section{background:#fff;border:1px solid #ddd;border-radius:4px;margin-bottom:14px;overflow:hidden}
+  .section-title{background:#003366;color:#fff;padding:8px 14px;font-size:12px;font-weight:700;letter-spacing:.5px;display:flex;align-items:center;justify-content:space-between}
+  .section-body{padding:14px}
+  /* ETAPAS */
+  .etapas-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+  .etapa-card{border-radius:4px;overflow:hidden;border:1px solid #e5e7eb}
+  .etapa-header{padding:8px 10px;font-size:11px;font-weight:700;color:#fff}
+  .etapa-body{padding:10px;background:#fff}
+  .etapa-pct{font-size:26px;font-weight:700;margin-bottom:4px}
+  .etapa-area{font-size:10px;color:#666;margin-bottom:8px}
+  .bar-bg{height:6px;background:#e5e7eb;border-radius:3px;overflow:hidden}
+  .bar-fill{height:100%;border-radius:3px}
+  .st-ok .etapa-header{background:#16a34a}
+  .st-ok .etapa-pct{color:#16a34a}
+  .st-ok .bar-fill{background:#16a34a}
+  .st-atencao .etapa-header{background:#f59e0b}
+  .st-atencao .etapa-pct{color:#d97706}
+  .st-atencao .bar-fill{background:#f59e0b}
+  .st-alerta .etapa-header{background:#dc2626}
+  .st-alerta .etapa-pct{color:#dc2626}
+  .st-alerta .bar-fill{background:#dc2626}
+  /* BM TABLE */
+  .bm-wrap{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:11px}
+  thead th{background:#003366;color:#fff;padding:7px 8px;text-align:center;white-space:nowrap;font-weight:600;font-size:10px;border:1px solid #002244}
+  thead th.left{text-align:left}
+  tbody tr:nth-child(even){background:#f8f9fa}
+  tbody tr:hover{background:#e8eef5}
+  tbody td{padding:6px 8px;border:1px solid #e5e7eb;text-align:center}
+  tbody td.left{text-align:left}
+  tbody td.bm-label{font-weight:700;background:#e8eef5;color:#003366}
+  tbody td.total-row{font-weight:700;background:#003366;color:#fff}
+  /* STATUS BADGES */
+  .badge{display:inline-block;padding:2px 7px;border-radius:10px;font-size:9px;font-weight:700;white-space:nowrap}
+  .badge-ok{background:#dcfce7;color:#166534}
+  .badge-atencao{background:#fef9c3;color:#854d0e}
+  .badge-alerta{background:#fee2e2;color:#991b1b}
+  .badge-zero{background:#f1f5f9;color:#475569}
+  .badge-tipo-tubo{background:#dbeafe;color:#1e40af}
+  .badge-tipo-perfil{background:#ede9fe;color:#5b21b6}
+  /* FILTROS */
+  .filtros{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+  .filtros select,.filtros input{border:1px solid #d1d5db;border-radius:4px;padding:5px 8px;font-size:11px;font-family:Arial,sans-serif;background:#fff;color:#1a1a1a}
+  .filtros label{font-size:11px;color:#374151;font-weight:600}
+  .btn{border:none;border-radius:4px;padding:5px 12px;font-size:11px;cursor:pointer;font-family:Arial,sans-serif;font-weight:600}
+  .btn-primary{background:#003366;color:#fff}
+  .btn-secondary{background:#f1f5f9;color:#374151;border:1px solid #d1d5db}
+  /* DETAIL TABLE */
+  .detail-wrap{overflow-x:auto;max-height:520px;overflow-y:auto}
+  .detail-wrap table{font-size:10px}
+  .detail-wrap thead th{position:sticky;top:0;z-index:10;font-size:10px;padding:6px 6px}
+  .detail-wrap tbody td{padding:5px 6px}
+  .flag{display:inline-block;width:18px;height:18px;line-height:18px;text-align:center;border-radius:3px;font-size:9px;font-weight:700}
+  .flag-1{background:#dcfce7;color:#166534}
+  .flag-0{background:#f1f5f9;color:#9ca3af}
+  /* RODAPÉ */
+  .footer{margin-top:14px;background:#003366;color:#b0c4de;padding:10px 20px;border-radius:0 0 6px 6px;display:flex;justify-content:space-between;font-size:9px}
+  /* PRINT */
+  @media print{
+    body{background:#fff;padding:0}
+    .filtros,.btn{display:none}
+    .detail-wrap{max-height:none;overflow:visible}
+  }
+  .count-info{font-size:10px;color:#6b7280;margin-left:auto}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="header-logo">CONSÓRCIO POSSEBON / CPL</div>
+    <div class="header-sub">RNEST/UTAA-TR · PETROBRAS · IPOJUCA–PE</div>
+  </div>
+  <div class="header-right">
+    <div style="font-size:13px;font-weight:700;color:#f5a623">RELATÓRIO DE CONTROLE DE APONTAMENTO</div>
+    <div>Serviço de Tratamento de Superfície e Pintura — Resumo Geral Consolidado</div>
+    <div>Emissão: 03/07/2025 &nbsp;|&nbsp; Revisão: 00</div>
+  </div>
+</div>
+<div class="doc-info">
+  <span><b>Documento:</b> CTRL-APT-RSMO-001</span>
+  <span><b>Contrato:</b> CCS</span>
+  <span><b>Consolidado de:</b> 6 Abas de Evidências (BM 1 a BM 6)</span>
+  <span><b>Base de dados:</b> CONTROLE_DE_APONTAMENTO.xlsx · Aba: RESUMO GERAL</span>
+</div>
+
+<!-- KPIs -->
+<div class="kpi-row">
+  <div class="kpi">
+    <div class="kpi-label">Itens apontados</div>
+    <div class="kpi-value">144</div>
+    <div class="kpi-sub">TUBO: 130 &nbsp;|&nbsp; PERFIL: 14</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">Área total (m²)</div>
+    <div class="kpi-value">1.067,24</div>
+    <div class="kpi-sub">Fator m² ponderado</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">Boletins de Medição</div>
+    <div class="kpi-value">6</div>
+    <div class="kpi-sub">BM 1 a BM 6</div>
+  </div>
+  <div class="kpi" style="border-left-color:#1e40af">
+    <div class="kpi-label">Itens — Tubo</div>
+    <div class="kpi-value" style="color:#1e40af">130</div>
+    <div class="kpi-sub">958,84 m² &nbsp;|&nbsp; 90,3% dos itens</div>
+  </div>
+  <div class="kpi" style="border-left-color:#5b21b6">
+    <div class="kpi-label">Itens — Perfil</div>
+    <div class="kpi-value" style="color:#5b21b6">14</div>
+    <div class="kpi-sub">108,40 m² &nbsp;|&nbsp; 9,7% dos itens</div>
+  </div>
+</div>
+
+<!-- ETAPAS -->
+<div class="section">
+  <div class="section-title">ITEM CONSUMIDO POR ETAPA — % da área concluída (ponderado por m²)</div>
+  <div class="section-body">
+    <div class="etapas-grid" style="grid-template-columns:repeat(4,1fr)">
+      <div class="etapa-card st-ok">
+        <div class="etapa-header">Abrasivo</div>
+        <div class="etapa-body">
+          <div class="etapa-pct">98,4%</div>
+          <div class="etapa-area">1.050,54 m² / 1.067,24 m²</div>
+          <div class="bar-bg"><div class="bar-fill" style="width:98.4%"></div></div>
+        </div>
+      </div>
+      <div class="etapa-card st-ok">
+        <div class="etapa-header">Primer (P1)</div>
+        <div class="etapa-body">
+          <div class="etapa-pct">93,8%</div>
+          <div class="etapa-area">1.000,74 m² / 1.067,24 m²</div>
+          <div class="bar-bg"><div class="bar-fill" style="width:93.8%"></div></div>
+        </div>
+      </div>
+      <div class="etapa-card st-alerta">
+        <div class="etapa-header">Prime (P2)</div>
+        <div class="etapa-body">
+          <div class="etapa-pct">5,5%</div>
+          <div class="etapa-area">58,60 m² / 1.067,24 m²</div>
+          <div class="bar-bg"><div class="bar-fill" style="width:5.5%"></div></div>
+        </div>
+      </div>
+      <div class="etapa-card st-atencao">
+        <div class="etapa-header">Tinta (acabamento)</div>
+        <div class="etapa-body">
+          <div class="etapa-pct">56,2%</div>
+          <div class="etapa-area">600,13 m² / 1.067,24 m²</div>
+          <div class="bar-bg"><div class="bar-fill" style="width:56.2%"></div></div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:10px;font-size:10px;color:#6b7280;border-top:1px solid #e5e7eb;padding-top:8px">
+      <b>Metodologia:</b> % calculado como Σ(flag_etapa × área_m²) ÷ Σ(área_m²) — ponderação por área, não por contagem de itens. Flags 0/1 por item conforme apontamento nas abas de evidências.
+    </div>
+  </div>
+</div>
+
+<!-- QUADRO POR BM -->
+<div class="section">
+  <div class="section-title">QUADRO CONSOLIDADO POR BOLETIM DE MEDIÇÃO</div>
+  <div class="section-body">
+    <div class="bm-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="left">BM</th>
+            <th>Itens</th>
+            <th>Área Total (m²)</th>
+            <th>Abrasivo (m²)</th>
+            <th>P1 (m²)</th>
+            <th>P2 (m²)</th>
+            <th>Tinta (m²)</th>
+            <th>% Tinta</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="left bm-label">BM 1</td>
+            <td>34</td><td>227,32</td><td>227,32</td><td>177,52</td><td>52,90</td><td>143,42</td>
+            <td>63,1%</td>
+          </tr>
+          <tr>
+            <td class="left bm-label">BM 2</td>
+            <td>13</td><td>245,84</td><td>245,84</td><td>245,84</td><td>0,00</td><td>245,84</td>
+            <td>100,0%</td>
+          </tr>
+          <tr>
+            <td class="left bm-label">BM 3</td>
+            <td>21</td><td>118,20</td><td>118,20</td><td>118,20</td><td>0,00</td><td>36,95</td>
+            <td>31,3%</td>
+          </tr>
+          <tr>
+            <td class="left bm-label">BM 4</td>
+            <td>39</td><td>227,23</td><td>210,53</td><td>210,53</td><td>0,00</td><td>126,89</td>
+            <td>55,8%</td>
+          </tr>
+          <tr>
+            <td class="left bm-label">BM 5</td>
+            <td>16</td><td>92,60</td><td>92,60</td><td>92,60</td><td>5,70</td><td>47,02</td>
+            <td>50,8%</td>
+          </tr>
+          <tr>
+            <td class="left bm-label">BM 6</td>
+            <td>21</td><td>156,05</td><td>156,05</td><td>156,05</td><td>0,00</td><td>0,00</td>
+            <td>0,0%</td>
+          </tr>
+          <tr>
+            <td class="left" style="background:#003366;color:#fff;font-weight:700">TOTAL</td>
+            <td class="total-row">144</td>
+            <td class="total-row">1.067,24</td>
+            <td class="total-row">1.050,54</td>
+            <td class="total-row">1.000,74</td>
+            <td class="total-row">58,60</td>
+            <td class="total-row">600,13</td>
+            <td class="total-row">56,2%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- TABELA ANALÍTICA DETALHADA -->
+<div class="section">
+  <div class="section-title">
+    <span>RELAÇÃO ANALÍTICA DE ITENS — CONTROLE POR ETAPAS DE PINTURA</span>
+    <span id="count-label" style="font-size:10px;font-weight:400;color:#b0c4de">144 itens</span>
+  </div>
+  <div class="section-body">
+    <div class="filtros">
+      <label>BM:</label>
+      <select id="f-bm" onchange="filtrar()">
+        <option value="">Todos</option>
+        <option value="1">BM 1</option>
+        <option value="2">BM 2</option>
+        <option value="3">BM 3</option>
+        <option value="4">BM 4</option>
+        <option value="5">BM 5</option>
+        <option value="6">BM 6</option>
+      </select>
+      <label>Tipo:</label>
+      <select id="f-tipo" onchange="filtrar()">
+        <option value="">Todos</option>
+        <option value="TUBO">Tubo</option>
+        <option value="PERFIL">Perfil</option>
+      </select>
+      <label>Busca:</label>
+      <input type="text" id="f-busca" placeholder="TAG, componente..." oninput="filtrar()" style="width:160px">
+      <button class="btn btn-secondary" onclick="resetFiltros()">Limpar</button>
+      <button class="btn btn-primary" onclick="window.print()">&#128438; Imprimir</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <div style="background:#dbeafe;border:1px solid #93c5fd;border-left:4px solid #1e40af;border-radius:4px;padding:10px 14px">
+        <div style="font-size:10px;color:#1e40af;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">Tubos — seleção atual</div>
+        <div style="display:flex;gap:24px;align-items:baseline">
+          <div><span id="card-tubo-qt" style="font-size:22px;font-weight:700;color:#1e3a8a">130</span><span style="font-size:10px;color:#1e40af;margin-left:4px">itens</span></div>
+          <div><span id="card-tubo-area" style="font-size:22px;font-weight:700;color:#1e3a8a">958,84</span><span style="font-size:10px;color:#1e40af;margin-left:4px">m²</span></div>
+        </div>
+      </div>
+      <div style="background:#ede9fe;border:1px solid #c4b5fd;border-left:4px solid #5b21b6;border-radius:4px;padding:10px 14px">
+        <div style="font-size:10px;color:#5b21b6;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">Perfis — seleção atual</div>
+        <div style="display:flex;gap:24px;align-items:baseline">
+          <div><span id="card-perfil-qt" style="font-size:22px;font-weight:700;color:#3b0764">14</span><span style="font-size:10px;color:#5b21b6;margin-left:4px">itens</span></div>
+          <div><span id="card-perfil-area" style="font-size:22px;font-weight:700;color:#3b0764">108,40</span><span style="font-size:10px;color:#5b21b6;margin-left:4px">m²</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="detail-wrap">
+      <table id="detail-table">
+        <thead>
+          <tr>
+            <th class="left">Aba / Origem</th>
+            <th>Item</th>
+            <th>BM</th>
+            <th class="left">TAG</th>
+            <th class="left">Componente</th>
+            <th>Tipo</th>
+            <th>Qt.</th>
+            <th>Fat. m²</th>
+            <th>Total m²</th>
+            <th>ABR</th>
+            <th>P1</th>
+            <th>P2</th>
+            <th>TINTA</th>
+          </tr>
+        </thead>
+        <tbody id="detail-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <span>Consórcio Possebon/CPL · RNEST/UTAA-TR · Petrobras · Ipojuca–PE · Administração Contratual</span>
+  <span>CTRL-APT-RSMO-001 · Rev.00 · 03/07/2025 · CONFIDENCIAL — USO INTERNO</span>
+</div>
+
+<script>
+const ROWS = [{"aba":"02. RL DE EVIDÊNCIAS","item":1,"bm":1,"tag":"149-06","comp":"SPOOL 28\"","tipo":"TUBO","qt":3.0,"fm":12.35,"area":37.05,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS","item":2,"bm":1,"tag":"143-04","comp":"SPOOL 28\"","tipo":"TUBO","qt":1.0,"fm":10.75,"area":10.75,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS","item":3,"bm":1,"tag":"136-04","comp":"SPOOL 28\"","tipo":"TUBO","qt":1.0,"fm":11.52,"area":11.52,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS","item":4,"bm":1,"tag":"134-20","comp":"SPOOL 28\" (CARRETEL)","tipo":"TUBO","qt":1.0,"fm":4.68,"area":4.68,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS","item":5,"bm":1,"tag":"135-03","comp":"SPOOL 28\" (CARRETEL)","tipo":"TUBO","qt":1.0,"fm":4.68,"area":4.68,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS","item":6,"bm":1,"tag":"136-03","comp":"SPOOL 28\" (CARRETEL)","tipo":"TUBO","qt":1.0,"fm":4.68,"area":4.68,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS","item":7,"bm":1,"tag":"138-03","comp":"SPOOL 28\" (CARRETEL)","tipo":"TUBO","qt":1.0,"fm":4.68,"area":4.68,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS","item":8,"bm":1,"tag":"139-03","comp":"SPOOL 28\" (CARRETEL)","tipo":"TUBO","qt":1.0,"fm":4.68,"area":4.68,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS","item":9,"bm":1,"tag":"137-05","comp":"SPOOL 28\"","tipo":"TUBO","qt":1.0,"fm":6.84,"area":6.84,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS","item":10,"bm":1,"tag":"137-05","comp":"SPOOL 28\"","tipo":"TUBO","qt":1.0,"fm":6.84,"area":6.84,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS","item":11,"bm":1,"tag":"138-06","comp":"SPOOL 28\"","tipo":"TUBO","qt":1.0,"fm":12.35,"area":12.35,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS","item":12,"bm":1,"tag":"146-01","comp":"SPOOL 6\"","tipo":"TUBO","qt":1.0,"fm":2.01,"area":2.01,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS","item":13,"bm":1,"tag":"147-01","comp":"SPOOL 6\"","tipo":"TUBO","qt":1.0,"fm":2.01,"area":2.01,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS","item":14,"bm":1,"tag":"148-01","comp":"SPOOL 6\"","tipo":"TUBO","qt":1.0,"fm":2.01,"area":2.01,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS","item":15,"bm":1,"tag":"149-01","comp":"SPOOL 6\"","tipo":"TUBO","qt":1.0,"fm":2.01,"area":2.01,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS","item":16,"bm":1,"tag":"150-01","comp":"SPOOL 6\"","tipo":"TUBO","qt":1.0,"fm":2.01,"area":2.01,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS","item":17,"bm":1,"tag":"151-01","comp":"SPOOL 6\"","tipo":"TUBO","qt":1.0,"fm":2.01,"area":2.01,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS","item":18,"bm":1,"tag":"S\\N","comp":"SPOOL 4\"","tipo":"TUBO","qt":2.0,"fm":0.257,"area":0.514,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS","item":19,"bm":1,"tag":"126-03","comp":"FLANGE COM PESCOÇO 35\"","tipo":"TUBO","qt":1.0,"fm":1.1,"area":1.1,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS","item":20,"bm":1,"tag":"127-03","comp":"FLANGE COM PESCOÇO 35\"","tipo":"TUBO","qt":1.0,"fm":1.1,"area":1.1,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS","item":21,"bm":1,"tag":"128-03","comp":"FLANGE COM PESCOÇO 35\"","tipo":"TUBO","qt":1.0,"fm":1.1,"area":1.1,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS","item":22,"bm":1,"tag":"42333","comp":"PERFIL \\VIGA ( JATO+ 02 T.FUNDO +ACABAMENTO)","tipo":"PERFIL","qt":1.0,"fm":5.1,"area":5.1,"abr":1,"p1":1,"p2":1,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS","item":23,"bm":1,"tag":"42154","comp":"PERFIL \\VIGA ( JATO+ 02 T.FUNDO)","tipo":"PERFIL","qt":1.0,"fm":8.0,"area":8.0,"abr":1,"p1":1,"p2":1,"prime":1,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS","item":24,"bm":1,"tag":"42156","comp":"PERFIL \\VIGA ( JATO+ 02 T.FUNDO +ACABAMENTO)","tipo":"PERFIL","qt":1.0,"fm":11.2,"area":11.2,"abr":1,"p1":1,"p2":1,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS","item":25,"bm":1,"tag":"42565","comp":"PERFIL \\VIGA ( JATO+ 02 T,FUNDO +ACABAMENTO)","tipo":"PERFIL","qt":1.0,"fm":2.5,"area":2.5,"abr":1,"p1":1,"p2":1,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS","item":26,"bm":1,"tag":"42092","comp":"PERFIL \\VIGA (JATO )","tipo":"PERFIL","qt":1.0,"fm":6.5,"area":6.5,"abr":1,"p1":0,"p2":0,"prime":0,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS","item":28,"bm":1,"tag":"42044","comp":"PERFIL \\VIGA (JATO + 02  T. FUNDO)","tipo":"PERFIL","qt":2.0,"fm":1.7,"area":3.4,"abr":1,"p1":1,"p2":1,"prime":1,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS","item":29,"bm":1,"tag":"42043","comp":"PERFIL \\VIGA ( JATO + 02 T. FUNDO)","tipo":"PERFIL","qt":2.0,"fm":3.5,"area":7.0,"abr":1,"p1":1,"p2":1,"prime":1,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS","item":30,"bm":1,"tag":"42153","comp":"PERFIL \\VIGA ( JATO + 02 T. FUNDO)","tipo":"PERFIL","qt":1.0,"fm":14.1,"area":14.1,"abr":1,"p1":1,"p2":1,"prime":1,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS","item":31,"bm":1,"tag":"42408","comp":"PERFIL \\VIGA (JATO + 01 T.FUNDO)","tipo":"PERFIL","qt":1.0,"fm":1.6,"area":1.6,"abr":1,"p1":1,"p2":1,"prime":1,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS","item":32,"bm":1,"tag":"42378","comp":"PERFIL \\VIGA  (JATO )","tipo":"PERFIL","qt":3.0,"fm":1.5,"area":4.5,"abr":1,"p1":0,"p2":0,"prime":0,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS","item":33,"bm":1,"tag":"42155","comp":"PERFIL \\VIGA  (JATO)","tipo":"PERFIL","qt":1.0,"fm":8.0,"area":8.0,"abr":1,"p1":0,"p2":0,"prime":0,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS","item":34,"bm":1,"tag":"42157","comp":"PERFIL \\VIGA  (JATO)","tipo":"PERFIL","qt":2.0,"fm":11.2,"area":22.4,"abr":1,"p1":0,"p2":0,"prime":0,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS","item":35,"bm":1,"tag":"42422","comp":"PERFIL \\VIGA (JATO)","tipo":"PERFIL","qt":1.0,"fm":8.4,"area":8.4,"abr":1,"p1":0,"p2":0,"prime":0,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS (2)","item":35,"bm":2,"tag":"126-01","comp":"SPOOL 56\"","tipo":"TUBO","qt":1.0,"fm":30.51,"area":30.51,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (2)","item":36,"bm":2,"tag":"127-01","comp":"SPOOL 56\"","tipo":"TUBO","qt":1.0,"fm":30.51,"area":30.51,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (2)","item":37,"bm":2,"tag":"128-01","comp":"SPOOL 56\"","tipo":"TUBO","qt":1.0,"fm":30.51,"area":30.51,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (2)","item":38,"bm":2,"tag":"129-06","comp":"SPOOL 42\"","tipo":"TUBO","qt":1.0,"fm":31.45,"area":31.45,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (2)","item":39,"bm":2,"tag":"130-06","comp":"SPOOL 42\"","tipo":"TUBO","qt":1.0,"fm":31.45,"area":31.45,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (2)","item":40,"bm":2,"tag":"131-06","comp":"SPOOL 42\"","tipo":"TUBO","qt":1.0,"fm":31.45,"area":31.45,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (2)","item":41,"bm":2,"tag":"135-05","comp":"SPOOL 28\"","tipo":"TUBO","qt":1.0,"fm":6.62,"area":6.62,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (2)","item":42,"bm":2,"tag":"136-05","comp":"SPOOL 28\"","tipo":"TUBO","qt":1.0,"fm":7.42,"area":7.42,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (2)","item":43,"bm":2,"tag":"137-03","comp":"SPOOL 28\" carretel","tipo":"TUBO","qt":1.0,"fm":4.68,"area":4.68,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (2)","item":44,"bm":2,"tag":"138-05","comp":"SPOOL 28\"","tipo":"TUBO","qt":1.0,"fm":6.62,"area":6.62,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (2)","item":45,"bm":2,"tag":"135-04","comp":"SPOOL 28\"","tipo":"TUBO","qt":1.0,"fm":11.52,"area":11.52,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (2)","item":46,"bm":2,"tag":"139-04","comp":"SPOOL 28\"","tipo":"TUBO","qt":1.0,"fm":10.75,"area":10.75,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (2)","item":47,"bm":2,"tag":"136-06","comp":"SPOOL 28\"","tipo":"TUBO","qt":1.0,"fm":12.35,"area":12.35,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (3)","item":48,"bm":3,"tag":"155-02","comp":"SPOOL 12\"","tipo":"TUBO","qt":1.0,"fm":4.3,"area":4.3,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (3)","item":49,"bm":3,"tag":"154-02","comp":"SPOOL 12\"","tipo":"TUBO","qt":1.0,"fm":2.91,"area":2.91,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (3)","item":50,"bm":3,"tag":"191-01","comp":"SPOOL 6\"","tipo":"TUBO","qt":1.0,"fm":0.67,"area":0.67,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (3)","item":51,"bm":3,"tag":"122-01","comp":"SPOOL 3\"","tipo":"TUBO","qt":1.0,"fm":0.56,"area":0.56,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (3)","item":52,"bm":3,"tag":"164-01","comp":"SPOOL 3\"","tipo":"TUBO","qt":1.0,"fm":0.37,"area":0.37,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (3)","item":53,"bm":3,"tag":"164-02","comp":"SPOOL 3\"","tipo":"TUBO","qt":1.0,"fm":0.36,"area":0.36,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (3)","item":54,"bm":3,"tag":"167-01","comp":"SPOOL 4\"","tipo":"TUBO","qt":1.0,"fm":2.22,"area":2.22,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (3)","item":55,"bm":3,"tag":"130-04","comp":"SPOOL CARRETEL 42\"","tipo":"TUBO","qt":1.0,"fm":4.8,"area":4.8,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (3)","item":56,"bm":3,"tag":"131-04","comp":"SPOOL CARRETEL 42\"","tipo":"TUBO","qt":1.0,"fm":4.8,"area":4.8,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (3)","item":57,"bm":3,"tag":"129-04","comp":"SPOOL CARRETEL 42\"","tipo":"TUBO","qt":1.0,"fm":4.8,"area":4.8,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (3)","item":58,"bm":3,"tag":"129-03","comp":"SPOOL CARRETEL 42\"","tipo":"TUBO","qt":1.0,"fm":3.39,"area":3.39,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (3)","item":59,"bm":3,"tag":"131-05","comp":"SPOOL CARRETEL 42\"","tipo":"TUBO","qt":1.0,"fm":2.14,"area":2.14,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (3)","item":60,"bm":3,"tag":"137-02","comp":"SPOOLL CARRETEL 28\"","tipo":"TUBO","qt":1.0,"fm":1.36,"area":1.36,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (3)","item":61,"bm":3,"tag":"139-02","comp":"SPOOL CARRETEL 28\"","tipo":"TUBO","qt":1.0,"fm":1.36,"area":1.36,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (3)","item":62,"bm":3,"tag":"129-01","comp":"FLANGE 32\"","tipo":"TUBO","qt":1.0,"fm":0.97,"area":0.97,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (3)","item":63,"bm":3,"tag":"130-01","comp":"FLANGE 32\"","tipo":"TUBO","qt":1.0,"fm":0.97,"area":0.97,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (3)","item":64,"bm":3,"tag":"131-01","comp":"FLANGE 32\"","tipo":"TUBO","qt":1.0,"fm":0.97,"area":0.97,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (3)","item":65,"bm":3,"tag":"A 160 B","comp":"TUBO RETO 1\" X 6000mm","tipo":"TUBO","qt":3.0,"fm":0.16,"area":2.88,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS (3)","item":66,"bm":3,"tag":"-","comp":"TUBO RETO 1.1\\2\" SCH 80  X 5800mm","tipo":"TUBO","qt":24.0,"fm":0.16,"area":22.272,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS (3)","item":67,"bm":3,"tag":"-","comp":"TUBO RETO 1\" X 5800mm  SCH 160","tipo":"TUBO","qt":30.0,"fm":0.11,"area":19.14,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS (3)","item":68,"bm":3,"tag":"A 106 B","comp":"TUBO RETO 1\\4\" X 6000mm SCH","tipo":"TUBO","qt":56.0,"fm":0.11,"area":36.96,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS (4)","item":69,"bm":4,"tag":"sem tag","comp":"TUBO 28\"","tipo":"TUBO","qt":2.0,"fm":2.25,"area":54.0,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (4)","item":70,"bm":4,"tag":"A 106 B","comp":"TUBO 3\\4\"  ROSCA","tipo":"TUBO","qt":8.0,"fm":0.09,"area":4.32,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS (4)","item":71,"bm":4,"tag":"-","comp":"TUBO 3\\4\"  SCH 160","tipo":"TUBO","qt":16.0,"fm":0.09,"area":8.352,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS (4)","item":72,"bm":4,"tag":"-","comp":"TUBO 1.1\\2\" SCH 80","tipo":"TUBO","qt":8.0,"fm":0.15,"area":6.96,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS (4)","item":73,"bm":4,"tag":"-","comp":"TUBO 1\" ASTM A106B","tipo":"TUBO","qt":9.0,"fm":0.15,"area":8.1,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS (4)","item":74,"bm":4,"tag":"-","comp":"TUBO 1\" ASTM A106B","tipo":"TUBO","qt":21.0,"fm":0.11,"area":13.86,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS (4)","item":75,"bm":4,"tag":"-","comp":"TUBO 1\" ASTM A106 B ROSCA","tipo":"TUBO","qt":89.0,"fm":0.11,"area":58.74,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS (4)","item":76,"bm":4,"tag":"SEM TAG","comp":"REDUÇÃO 42\" X 36\"","tipo":"TUBO","qt":2.0,"fm":3.15,"area":3.843,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (4)","item":77,"bm":4,"tag":"12901 B \\ 13001","comp":"REDUÇÃO 36\" X 32\"","tipo":"TUBO","qt":2.0,"fm":2.7,"area":3.294,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (4)","item":78,"bm":4,"tag":"136 2","comp":"CARRETEL 28\"","tipo":"TUBO","qt":1.0,"fm":1.34,"area":1.34,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (4)","item":79,"bm":4,"tag":"137 2","comp":"CARRETEL 28\"","tipo":"TUBO","qt":1.0,"fm":1.34,"area":1.34,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (4)","item":80,"bm":4,"tag":"138 2","comp":"CARRETEL 28\"","tipo":"TUBO","qt":1.0,"fm":1.34,"area":1.34,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (4)","item":81,"bm":4,"tag":"139 2","comp":"CARRETEL 28\"","tipo":"TUBO","qt":1.0,"fm":1.34,"area":1.34,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (4)","item":82,"bm":4,"tag":"FE540005","comp":"CARRETEL 28\"","tipo":"TUBO","qt":1.0,"fm":3.95,"area":3.95,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (4)","item":83,"bm":4,"tag":"FE540011","comp":"CARRETEL 28\"","tipo":"TUBO","qt":1.0,"fm":3.95,"area":3.95,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (4)","item":84,"bm":4,"tag":"FE540012","comp":"CARRETEL 28\"","tipo":"TUBO","qt":1.0,"fm":3.95,"area":3.95,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (4)","item":85,"bm":4,"tag":"FE540013","comp":"CARRETEL 28\"","tipo":"TUBO","qt":1.0,"fm":3.95,"area":3.95,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (4)","item":86,"bm":4,"tag":"FE540014","comp":"CARRETEL 28\"","tipo":"TUBO","qt":1.0,"fm":3.95,"area":3.95,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (4)","item":87,"bm":4,"tag":"FE540015","comp":"CARRETEL 28\"","tipo":"TUBO","qt":1.0,"fm":3.95,"area":3.95,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (4)","item":88,"bm":4,"tag":"120 2","comp":"SPOOL 3\"","tipo":"TUBO","qt":1.0,"fm":0.22,"area":0.22,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (4)","item":89,"bm":4,"tag":"121 2","comp":"SPOOL 3\"","tipo":"TUBO","qt":1.0,"fm":0.22,"area":0.22,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (4)","item":90,"bm":4,"tag":"122 2","comp":"SPOOL 3\"","tipo":"TUBO","qt":1.0,"fm":0.22,"area":0.22,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (4)","item":91,"bm":4,"tag":"123 2","comp":"SPOOL 3\"","tipo":"TUBO","qt":1.0,"fm":0.22,"area":0.22,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (4)","item":92,"bm":4,"tag":"124 2","comp":"SPOOL 3\"","tipo":"TUBO","qt":1.0,"fm":0.22,"area":0.22,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (4)","item":93,"bm":4,"tag":"125 2","comp":"SPOOL 3\"","tipo":"TUBO","qt":1.0,"fm":0.22,"area":0.22,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (4)","item":94,"bm":4,"tag":"102 2","comp":"SPOOL 3\"","tipo":"TUBO","qt":1.0,"fm":0.13,"area":0.13,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (4)","item":95,"bm":4,"tag":"112 03","comp":"SPOOL 6\"","tipo":"TUBO","qt":1.0,"fm":0.76,"area":0.76,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (4)","item":96,"bm":4,"tag":"179 03","comp":"SPOOL 6\"","tipo":"TUBO","qt":1.0,"fm":0.76,"area":0.76,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (4)","item":97,"bm":4,"tag":"0","comp":"SPOOL 28\"","tipo":"TUBO","qt":1.0,"fm":2.25,"area":6.6375,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (4)","item":98,"bm":4,"tag":"129 5","comp":"CARRETEL 42\"","tipo":"TUBO","qt":1.0,"fm":1.94,"area":1.94,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (4)","item":99,"bm":4,"tag":"135 1","comp":"SPOOL 28\"","tipo":"TUBO","qt":1.0,"fm":1.37,"area":1.37,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (4)","item":100,"bm":4,"tag":"133 01","comp":"SPOOL REDUÇÕES 8\" X 6\"","tipo":"TUBO","qt":1.0,"fm":0.78,"area":0.78,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (4)","item":101,"bm":4,"tag":"179 01","comp":"SPOOL 6\"","tipo":"TUBO","qt":1.0,"fm":0.28,"area":0.28,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (4)","item":102,"bm":4,"tag":"0","comp":"SPOLL CARRETEL 12\"","tipo":"TUBO","qt":1.0,"fm":3.74,"area":3.74,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (4)","item":103,"bm":4,"tag":"139 1","comp":"SPOOL 28\"","tipo":"TUBO","qt":1.0,"fm":1.43,"area":1.43,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (4)","item":104,"bm":4,"tag":"155 01","comp":"REDUÇÃO 14\" 12\"","tipo":"TUBO","qt":1.0,"fm":0.85,"area":0.85,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (4)","item":105,"bm":4,"tag":"44043","comp":"PERFIL \\ VIGA","tipo":"TUBO","qt":2.0,"fm":3.5,"area":7.0,"abr":0,"p1":0,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (4)","item":106,"bm":4,"tag":"44044","comp":"PERFIL \\ VIGA","tipo":"TUBO","qt":1.0,"fm":1.7,"area":1.7,"abr":0,"p1":0,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (4)","item":107,"bm":4,"tag":"42154","comp":"PERFIL \\ VIGA","tipo":"TUBO","qt":1.0,"fm":8.0,"area":8.0,"abr":0,"p1":0,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (5)","item":108,"bm":5,"tag":"121 -1","comp":"SPOOL 3\"","tipo":"TUBO","qt":1.0,"fm":0.64,"area":0.64,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (5)","item":109,"bm":5,"tag":"123-1","comp":"SPOOL 3\"","tipo":"TUBO","qt":1.0,"fm":0.64,"area":0.64,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (5)","item":110,"bm":5,"tag":"124-1","comp":"SPOOL 3\"","tipo":"TUBO","qt":1.0,"fm":0.64,"area":0.64,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (5)","item":111,"bm":5,"tag":"125-1","comp":"SPOOL 3\"","tipo":"TUBO","qt":1.0,"fm":0.64,"area":0.64,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (5)","item":112,"bm":5,"tag":"157-3","comp":"SPOOL 4\"","tipo":"TUBO","qt":2.0,"fm":2.07,"area":4.14,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (5)","item":113,"bm":5,"tag":"138-03","comp":"SPOOL 12\"","tipo":"TUBO","qt":1.0,"fm":4.82,"area":4.82,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (5)","item":114,"bm":5,"tag":"155-5","comp":"SPOOL 12\"","tipo":"TUBO","qt":1.0,"fm":1.02,"area":4.7328,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (5)","item":115,"bm":5,"tag":"154-04","comp":"SPOOL 12\"","tipo":"TUBO","qt":1.0,"fm":5.57,"area":5.57,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (5)","item":116,"bm":5,"tag":"157-5","comp":"SPOOL 4\"","tipo":"TUBO","qt":1.0,"fm":3.39,"area":3.39,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (5)","item":117,"bm":5,"tag":"132-1","comp":"SPOOL 8\"","tipo":"TUBO","qt":1.0,"fm":0.7,"area":2.037,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (5)","item":118,"bm":5,"tag":"S\\N","comp":"SPOOL 8\"","tipo":"TUBO","qt":1.0,"fm":0.7,"area":6.384,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (5)","item":119,"bm":5,"tag":"S\\N","comp":"SPOOL 8\"","tipo":"TUBO","qt":1.0,"fm":3.69,"area":3.69,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (5)","item":120,"bm":5,"tag":"S\\N","comp":"SPOOL 8\"","tipo":"TUBO","qt":1.0,"fm":4.0,"area":4.0,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (5)","item":121,"bm":5,"tag":"S\\N","comp":"TUBO RETO 3\\4\"","tipo":"TUBO","qt":18.0,"fm":0.09,"area":9.396,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS (5)","item":122,"bm":5,"tag":"S\\N","comp":"TUBO RETO 1\" ASTM A 106 B\"","tipo":"TUBO","qt":67.0,"fm":0.09,"area":36.18,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS (5)","item":123,"bm":5,"tag":"42092","comp":"VIGA","tipo":"PERFIL","qt":1.0,"fm":5.7,"area":5.7,"abr":1,"p1":1,"p2":1,"prime":1,"tinta":1},{"aba":"02. RL DE EVIDÊNCIAS (6)","item":124,"bm":6,"tag":"9072-05","comp":"SPOOL  8\"","tipo":"TUBO","qt":1.0,"fm":0.7,"area":6.335,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS (6)","item":125,"bm":6,"tag":"9072-07","comp":"SPOOL  8\"","tipo":"TUBO","qt":1.0,"fm":0.7,"area":3.57,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS (6)","item":126,"bm":6,"tag":"9072-12","comp":"TUBO 8\"","tipo":"TUBO","qt":1.0,"fm":0.7,"area":3.22,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS (6)","item":127,"bm":6,"tag":"9072-21","comp":"TUBO 8\"","tipo":"TUBO","qt":1.0,"fm":0.7,"area":3.5,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS (6)","item":128,"bm":6,"tag":"9072-13","comp":"TUBO 8\"","tipo":"TUBO","qt":1.0,"fm":0.7,"area":7.07,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS (6)","item":129,"bm":6,"tag":"9072-22","comp":"TUBO 8\"","tipo":"TUBO","qt":1.0,"fm":0.7,"area":7.7,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS (6)","item":130,"bm":6,"tag":"9072-15","comp":"TUBO 8\"","tipo":"TUBO","qt":1.0,"fm":0.7,"area":8.288,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS (6)","item":131,"bm":6,"tag":"9072-26","comp":"TUBO 8\"","tipo":"TUBO","qt":1.0,"fm":0.7,"area":8.288,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS (6)","item":132,"bm":6,"tag":"9072-23","comp":"TUBO 8\"","tipo":"TUBO","qt":1.0,"fm":0.7,"area":8.421,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS (6)","item":133,"bm":6,"tag":"9072-09","comp":"TUBO 8\"","tipo":"TUBO","qt":1.0,"fm":0.7,"area":8.421,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS (6)","item":134,"bm":6,"tag":"9072-25","comp":"TUBO 8\"","tipo":"TUBO","qt":1.0,"fm":0.7,"area":8.288,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS (6)","item":135,"bm":6,"tag":"9072-10","comp":"TUBO 8\"","tipo":"TUBO","qt":1.0,"fm":0.7,"area":8.435,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS (6)","item":136,"bm":6,"tag":"9072-03","comp":"SPOOL  8\"","tipo":"TUBO","qt":1.0,"fm":0.7,"area":7.7,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS (6)","item":137,"bm":6,"tag":"9072-24","comp":"SPOOL  8\"","tipo":"TUBO","qt":1.0,"fm":0.7,"area":8.68,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS (6)","item":138,"bm":6,"tag":"9072-31","comp":"SPOOL  8\"","tipo":"TUBO","qt":1.0,"fm":0.7,"area":8.68,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS (6)","item":139,"bm":6,"tag":"9072-16","comp":"SPOOL  8\"","tipo":"TUBO","qt":1.0,"fm":0.7,"area":8.092,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS (6)","item":140,"bm":6,"tag":"9072-08","comp":"TUBO 8\"","tipo":"TUBO","qt":1.0,"fm":0.7,"area":8.421,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS (6)","item":141,"bm":6,"tag":"9072-14","comp":"TUBO 8\"","tipo":"TUBO","qt":1.0,"fm":0.0,"area":11.85,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS (6)","item":142,"bm":6,"tag":"9072-27","comp":"SPOOL  8\"","tipo":"TUBO","qt":1.0,"fm":0.7,"area":8.68,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS (6)","item":143,"bm":6,"tag":"9072-19","comp":"SPOOL  8\"","tipo":"TUBO","qt":1.0,"fm":0.7,"area":6.811,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":0},{"aba":"02. RL DE EVIDÊNCIAS (6)","item":144,"bm":6,"tag":"9072-04","comp":"SPOOL  8\"","tipo":"TUBO","qt":1.0,"fm":0.7,"area":5.6,"abr":1,"p1":1,"p2":0,"prime":1,"tinta":0}];
+
+function flag(v){return `<span class="flag flag-${v}">${v?'✓':'—'}</span>`;}
+function fmt(n){return n.toFixed(4).replace('.',',').replace(/(\d)(?=(\d{3})+(?!\d))/g,'$1.');}
+
+function fmtNum(n){return n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+
+function renderRows(data){
+  const tb=document.getElementById('detail-body');
+  tb.innerHTML='';
+  let tuboQt=0,tuboArea=0,perfilQt=0,perfilArea=0;
+  data.forEach(r=>{
+    const tipoBadge=r.tipo==='TUBO'?'badge-tipo-tubo':'badge-tipo-perfil';
+    const abaShort=r.aba.replace('02. RL DE EVIDÊNCIAS','BM-Evidência');
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td class="left" style="white-space:nowrap;color:#555">${abaShort}</td>
+      <td>${r.item}</td><td><b>${r.bm}</b></td>
+      <td class="left" style="font-family:monospace;font-size:10px">${r.tag||'—'}</td>
+      <td class="left" style="max-width:180px;word-break:break-word">${r.comp}</td>
+      <td><span class="badge ${tipoBadge}">${r.tipo}</span></td>
+      <td>${r.qt%1===0?r.qt.toFixed(0):r.qt}</td>
+      <td>${r.fm.toFixed(4).replace('.',',')}</td>
+      <td><b>${r.area.toFixed(4).replace('.',',')}</b></td>
+      <td>${flag(r.abr)}</td><td>${flag(r.p1)}</td><td>${flag(r.p2)}</td>
+      <td>${flag(r.tinta)}</td>`;
+    tb.appendChild(tr);
+    if(r.tipo==='TUBO'){tuboQt++;tuboArea+=r.area;}
+    else{perfilQt++;perfilArea+=r.area;}
+  });
+  document.getElementById('count-label').textContent=`${data.length} itens exibidos`;
+  document.getElementById('card-tubo-qt').textContent=tuboQt;
+  document.getElementById('card-tubo-area').textContent=fmtNum(tuboArea);
+  document.getElementById('card-perfil-qt').textContent=perfilQt;
+  document.getElementById('card-perfil-area').textContent=fmtNum(perfilArea);
+}
+
+function filtrar(){
+  const bm=document.getElementById('f-bm').value;
+  const tipo=document.getElementById('f-tipo').value;
+  const busca=document.getElementById('f-busca').value.toLowerCase().trim();
+  const res=ROWS.filter(r=>{
+    if(bm&&r.bm!=bm)return false;
+    if(tipo&&r.tipo!==tipo)return false;
+    if(busca&&!(r.tag.toLowerCase().includes(busca)||r.comp.toLowerCase().includes(busca)))return false;
+    return true;
+  });
+  renderRows(res);
+}
+
+function resetFiltros(){
+  document.getElementById('f-bm').value='';
+  document.getElementById('f-tipo').value='';
+  document.getElementById('f-busca').value='';
+  renderRows(ROWS);
+}
+
+renderRows(ROWS);
+</script>
+</body>
+</html>
